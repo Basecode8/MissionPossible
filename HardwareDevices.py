@@ -1,9 +1,10 @@
 import RPi.GPIO as GPIO
-import EventHandling
 import time
 from pwm import PWM
 from gpiozero import LightSensor
 import Adafruit_BMP.BMP085 as BMP085
+import os
+import glob
 
 
 class Servo(object):
@@ -29,7 +30,7 @@ class Servo(object):
 class Beam(object):
     def __init__(self, led_pin_num, receiver_pin_num, channel=1):
         self.led_pin_num = led_pin_num
-        self.reciever_pin_num = receiver_pin_num
+        self.receiver_pin_num = receiver_pin_num
         GPIO.setup(led_pin_num, GPIO.OUT, initial=GPIO.LOW)
         GPIO.setup(receiver_pin_num, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
@@ -54,7 +55,7 @@ class Beam(object):
 
         GPIO.add_event_detect(self.receiver_pin_num, GPIO.FALLING, pulse)
         time.sleep(0.5)
-        GPIO.remove_event_detect(self.reciever_pin_num)
+        GPIO.remove_event_detect(self.receiver_pin_num)
         return pulses[0]
 
 class LightDetect(LightSensor):
@@ -87,49 +88,70 @@ class Water(object):
         return GPIO.input(self.waterPin)
 
 
-# Thermometer class here
+class Thermometer(object):
+    def __init__(self):
+        os.system('modprobe w1-gpio')
+        os.system('modprobe w1-therm')
+
+        self.base_dir = '/sys/bus/w1/devices/'
+        self.device_folder = glob.glob(self.base_dir + '28*')[0]
+        self.device_file = self.device_folder + '/w1_slave'
+
+    def read_temp_raw(self):
+        f = open(self.device_file, 'r')
+        lines = f.readlines()
+        f.close()
+        return lines
+
+    def read_temp(self):
+        lines = self.read_temp_raw()
+        while lines[0].strip()[-3:] != 'YES':
+            time.sleep(0.2)
+            lines = self.read_temp_raw()
+        equals_pos = lines[1].find('t=')
+        if equals_pos != -1:
+            temp_string = lines[1][equals_pos + 2:]
+            temp_c = float(temp_string) / 1000.0
+            temp_f = temp_c * 9.0 / 5.0 + 32.0
+            return temp_c, temp_f
 
 
 class IncandescentBulb(object):
-    def __init__(self, incandescentPin):
-        self.incandescentPin = incandescentPin
-        GPIO.setup(incandescentPin, GPIO.OUT, initial=GPIO.LOW)
+    def __init__(self, incandescent_pin):
+        self.incandescent_pin = incandescent_pin
+        GPIO.setup(incandescent_pin, GPIO.OUT, initial=GPIO.LOW)
 
     def turn_on(self):
-        GPIO.output(self.incandescentPin, GPIO.HIGH)
+        GPIO.output(self.incandescent_pin, GPIO.HIGH)
 
     def turn_off(self):
-        GPIO.output(self.incandescentPin, GPIO.LOW)
+        GPIO.output(self.incandescent_pin, GPIO.LOW)
 
 
 class SolarPanel(object):
-    def __init__(self, solarPin, event, eventDispatcher):
-        self.solarPin = solarPin
-        self.event = event
-        self.eventDispatcher = eventDispatcher
+    def __init__(self, solar_pin):
+        self.solar_pin = solar_pin
 
-        GPIO.setup(solarPin, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(solar_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def read(self):
-        return GPIO.input(self.solarPin)
+        return GPIO.input(self.solar_pin)
 
 
 class Match(object):
-    def __init__(self, matchPin):
-        self.matchPin = matchPin
-        GPIO.setup(matchPin, GPIO.OUT, initial=GPIO.LOW)
+    def __init__(self, match_pin):
+        self.match_pin = match_pin
+        GPIO.setup(match_pin, GPIO.OUT, initial=GPIO.LOW)
 
     def turn_on(self):
-        GPIO.output(self.matchPin, GPIO.HIGH)
+        GPIO.output(self.match_pin, GPIO.HIGH)
 
     def turn_off(self):
-        GPIO.output(self.matchPin, GPIO.LOW)
+        GPIO.output(self.match_pin, GPIO.LOW)
 
 
 class PressureSensor(object):
     def __init__(self):
-        self.event = eventDispatcher
-        self.eventDispatcher = eventDispatcher
         self.sensor = BMP085.BMP085()
 
     def read(self):
