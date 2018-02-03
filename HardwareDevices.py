@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 from pwm import PWM
 from gpiozero import LightSensor
-import Adafruit_BMP.BMP085 as BMP085
+import BMP085
 import os
 import glob
 
