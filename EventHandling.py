@@ -93,8 +93,8 @@ class ServoHandler(object):
         self.event_dispatcher = event_dispatcher
         self.servo = servo
 
-        self.event_dispatcher.add_event_listener(Events.MPEvent.RED_LED_NOT_DETECTED, self.servo.update, 0)
-        self.event_dispatcher.add_event_listener(Events.MPEvent.RED_LED_DETECTED, self.servo.update, 90)
+        self.event_dispatcher.add_event_listener(Events.MPEvent.RED_LED_NOT_DETECTED, self.servo.update, *(0,))
+        self.event_dispatcher.add_event_listener(Events.MPEvent.RED_LED_DETECTED, self.servo.update, *(90,))
 
 
 class LightDetectorHandler(object):
