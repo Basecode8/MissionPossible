@@ -38,11 +38,11 @@ class EventDispatcher(object):
             for listener in listeners:
                 listener[0](listener[1])  # The first item in the array is the function, and the second is the arguments
 
-    def add_event_listener(self, event_type, listener, *args):
+    def add_event_listener(self, event_type, listener, args):
         if not self.has_listener(event_type, listener):
             listeners = self._events.get(event_type, [])
 
-            listeners.append([listener, *args])
+            listeners.append([listener, args])
 
             self._events[event_type] = listeners
 
@@ -93,8 +93,8 @@ class ServoHandler(object):
         self.event_dispatcher = event_dispatcher
         self.servo = servo
 
-        self.event_dispatcher.add_event_listener(Events.MPEvent.RED_LED_NOT_DETECTED, self.servo.update, *(0,))
-        self.event_dispatcher.add_event_listener(Events.MPEvent.RED_LED_DETECTED, self.servo.update, *(90,))
+        self.event_dispatcher.add_event_listener(Events.MPEvent.RED_LED_NOT_DETECTED, self.servo.update, args=0)
+        self.event_dispatcher.add_event_listener(Events.MPEvent.RED_LED_DETECTED, self.servo.update, args=90)
 
 
 class LightDetectorHandler(object):
