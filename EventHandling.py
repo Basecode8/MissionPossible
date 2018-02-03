@@ -65,6 +65,7 @@ class BeamHandler(object):
         self.beam = beam
         self.is_done = True
         self.thread = threading.Thread()
+        self.connected()
 
     def _connected(self):
         while self.thread.is_alive():
@@ -102,6 +103,7 @@ class LightDetectorHandler(object):
         self.light_detector = light_detector
         self.event_dispatcher.add_event_listener(Events.MPEvent.BEAM_DISCONNECTED, self.detected)
         self.thread = threading.Thread()
+        self.detected()
 
     def _detected(self):
         while self.thread.is_alive():
@@ -130,6 +132,7 @@ class WaterHandler(object):
         self.event_dispatcher = event_dispatcher
         self.water = water
         self.thread = threading.Thread()
+        self.detect()
 
     def _detect(self):
         while self.thread.is_alive():
@@ -150,6 +153,7 @@ class ThermometerHandler(object):
         self.event_dispatcher = event_dispatcher
         self.thermometer = thermometer
         self.thread = threading.Thread()
+        self.detect()
 
     def _detect(self):
         while self.thread.is_alive():
@@ -180,6 +184,7 @@ class SolarHandler(object):
         self.event_dispatcher = event_dispatcher
         self.solar_panel = solar_panel
         self.thread = threading.Thread()
+        self.detect()
 
     def _detect(self):
         while self.thread.is_alive():
@@ -214,6 +219,7 @@ class PressureHandler(object):
         self.pressure_sensor = pressure_sensor
         self.event_dispatcher = event_dispatcher
         self.thread = threading.Thread()
+        self.detect()
 
     def _detect(self):
         while self.thread.is_alive():
