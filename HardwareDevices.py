@@ -79,8 +79,6 @@ class LightDetect(LightSensor):
 class Water(object):
     def __init__(self, waterPin):
         self.waterPin = waterPin
-        self.event = event
-        self.eventDispatcher = eventDispatcher
 
         GPIO.setup(waterPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
