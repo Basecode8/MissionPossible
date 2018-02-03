@@ -63,7 +63,7 @@ class LightDetect(LightSensor):
         self.ledPin = ledPin
         self.photoresistorPin = photoresistorPin
 
-        self.lightSensor = super(photoresistorPin)  # photoresistorPin is initialized here
+        self.lightSensor = super().__init__(photoresistorPin)  # photoresistorPin is initialized here
         GPIO.setup(ledPin, GPIO.OUT, initial=GPIO.LOW)
 
     def read(self):
